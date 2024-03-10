@@ -1,0 +1,1 @@
+console.warn('*** TODO: Add tests for @n3rdw1z4rd/core-ts!');
