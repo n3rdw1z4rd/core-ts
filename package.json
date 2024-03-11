@@ -4,10 +4,13 @@
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
+    "files":[
+        "dist"
+    ],
     "scripts": {
         "build": "tsc && shx cp -r ./src/css ./dist/css",
         "dev": "webpack serve",
-        "prepublishOnly": "build"
+        "prepublishOnly": "npm run build"
     },
     "keywords": [],
     "author": "",
