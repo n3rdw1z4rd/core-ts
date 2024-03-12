@@ -1,4 +1,5 @@
-import { Color, clamp } from '..';
+import { Color } from './color';
+import { clamp } from '../math';
 
 export class WebGlRenderer {
     private _canvas: HTMLCanvasElement;
