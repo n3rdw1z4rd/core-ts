@@ -3,7 +3,7 @@ import { clamp } from '../math';
 
 export class WebGlRenderer {
     private _canvas: HTMLCanvasElement;
-    private _gl: WebGL2RenderingContext | WebGLRenderingContext;
+    public gl: WebGL2RenderingContext | WebGLRenderingContext;
 
     private _program: WebGLProgram;
     private _positionLocation: number;
@@ -20,12 +20,12 @@ export class WebGlRenderer {
     constructor(canvas?: HTMLCanvasElement) {
         this._canvas = canvas ?? document.createElement('canvas');
 
-        this._gl = (this._canvas.getContext('webgl2') ?? this._canvas.getContext('webgl'))!;
+        this.gl = (this._canvas.getContext('webgl2') ?? this._canvas.getContext('webgl'))!;
 
-        this._program = this._gl.createProgram()!;
+        this._program = this.gl.createProgram()!;
 
-        const vertShader: WebGLShader = this._gl.createShader(this._gl.VERTEX_SHADER)!;
-        this._gl.shaderSource(vertShader, `
+        const vertShader: WebGLShader = this.gl.createShader(this.gl.VERTEX_SHADER)!;
+        this.gl.shaderSource(vertShader, `
             attribute vec2 a_position;
             varying vec2 v_texCoord;
             void main() {
@@ -34,11 +34,11 @@ export class WebGlRenderer {
             }
         `);
 
-        this._gl.compileShader(vertShader);
-        this._gl.attachShader(this._program, vertShader);
+        this.gl.compileShader(vertShader);
+        this.gl.attachShader(this._program, vertShader);
 
-        const fragShader: WebGLShader = this._gl.createShader(this._gl.FRAGMENT_SHADER)!;
-        this._gl.shaderSource(fragShader, `
+        const fragShader: WebGLShader = this.gl.createShader(this.gl.FRAGMENT_SHADER)!;
+        this.gl.shaderSource(fragShader, `
             precision mediump float;
             uniform sampler2D u_texture;
             varying vec2 v_texCoord;
@@ -47,53 +47,53 @@ export class WebGlRenderer {
             }
         `);
 
-        this._gl.compileShader(fragShader);
-        this._gl.attachShader(this._program, fragShader);
+        this.gl.compileShader(fragShader);
+        this.gl.attachShader(this._program, fragShader);
 
-        this._gl.linkProgram(this._program);
-        this._gl.useProgram(this._program);
+        this.gl.linkProgram(this._program);
+        this.gl.useProgram(this._program);
 
-        this._positionLocation = this._gl.getAttribLocation(this._program, 'a_position');
-        this._textureLocation = this._gl.getUniformLocation(this._program, 'u_texture')!;
+        this._positionLocation = this.gl.getAttribLocation(this._program, 'a_position');
+        this._textureLocation = this.gl.getUniformLocation(this._program, 'u_texture')!;
 
         this._pixelBuffer = new Uint8Array(this._canvas.width * this._canvas.height * 4);
 
-        this._texture = this._gl.createTexture()!;
+        this._texture = this.gl.createTexture()!;
         this._bindTexture();
 
-        this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_S, this._gl.CLAMP_TO_EDGE);
-        this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_WRAP_T, this._gl.CLAMP_TO_EDGE);
-        this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MIN_FILTER, this._gl.NEAREST);
-        this._gl.texParameteri(this._gl.TEXTURE_2D, this._gl.TEXTURE_MAG_FILTER, this._gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
 
-        this._surface = this._gl.createBuffer()!;
-        this._gl.bindBuffer(this._gl.ARRAY_BUFFER, this._surface);
-        this._gl.bufferData(
-            this._gl.ARRAY_BUFFER,
+        this._surface = this.gl.createBuffer()!;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._surface);
+        this.gl.bufferData(
+            this.gl.ARRAY_BUFFER,
             new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-            this._gl.STATIC_DRAW
+            this.gl.STATIC_DRAW
         );
 
-        this._gl.enableVertexAttribArray(this._positionLocation);
-        this._gl.vertexAttribPointer(this._positionLocation, 2, this._gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(this._positionLocation);
+        this.gl.vertexAttribPointer(this._positionLocation, 2, this.gl.FLOAT, false, 0, 0);
 
-        this._gl.activeTexture(this._gl.TEXTURE0);
-        this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
-        this._gl.uniform1i(this._textureLocation, 0);
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
+        this.gl.uniform1i(this._textureLocation, 0);
     }
 
     private _bindTexture(): void {
-        this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
 
-        this._gl.texImage2D(
-            this._gl.TEXTURE_2D,
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D,
             0,
-            this._gl.RGBA,
+            this.gl.RGBA,
             this._canvas.width,
             this._canvas.height,
             0,
-            this._gl.RGBA,
-            this._gl.UNSIGNED_BYTE,
+            this.gl.RGBA,
+            this.gl.UNSIGNED_BYTE,
             this._pixelBuffer
         );
     }
@@ -125,7 +125,7 @@ export class WebGlRenderer {
             this._canvas.width = displayWidth
             this._canvas.height = displayHeight;
 
-            this._gl.viewport(0, 0, displayWidth, displayHeight);
+            this.gl.viewport(0, 0, displayWidth, displayHeight);
             this._pixelBuffer = new Uint8Array(displayWidth * displayHeight * 4);
             this._bindTexture();
 
@@ -157,7 +157,7 @@ export class WebGlRenderer {
 
     render(): void {
         this._bindTexture();
-        this._gl.drawArrays(this._gl.TRIANGLE_STRIP, 0, 4);
+        this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
         this._pixelBuffer.fill(0);
     }
 }

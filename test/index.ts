@@ -1,35 +1,58 @@
-import '../src/css/reset.css';
-import '../src/css/my-styles.css';
-import { Clock, Emitter, Logger, clamp, rng } from '../src';
+// import './particles1';
+// import './particles2';
+// import './particles3';
 
-const logger: Logger = new Logger('[Test]');
-logger.traceEnabled = true;
-logger.trace('Logger.trace() test');
-logger.debug('Logger.debug() test');
-logger.info('Logger.info() test');
-logger.warn('Logger.warn() test');
-logger.error('Logger.error() test');
+import { Color, clamp } from '../src';
 
-const clock: Clock = new Clock();
-console.log('*** Clock:', clock);
-setTimeout(() => clock.stop(), 100);
-clock.run((deltaTime: number) => logger.debug('Clock.run: deltaTime:', deltaTime));
+function hsvToRgba(h: number, s: number, v: number, a: number): number[] {
+    h = (h % 1 + 1) % 1;
+    s = clamp(s, 0, 1);
+    v = clamp(v, 0, 1);
 
-const emitter: Emitter = new Emitter();
-emitter.on('test', (data: any) => logger.debug('Emitter.on() test:', data));
-emitter.emit('test', 'Test Data');
+    const i: number = (0 | (h * 6));
+    const f: number = h * 6 - i;
+    const p: number = v * (1 - s);
+    const q: number = v * (1 - f * s);
+    const t: number = v * (1 - (1 - f) * s);
 
-logger.debug('math.clamp(0, 10, 5):', clamp(0, 10, 5));
+    let r: number;
+    let g: number;
+    let b: number;
 
-for (let i = 0; i < 10; i++) {
-    logger.debug('rng():', rng());
+    switch (i % 6) {
+        case 0: [r, g, b] = [v, t, p];
+        case 1: [r, g, b] = [q, v, p];
+        case 2: [r, g, b] = [p, v, t];
+        case 3: [r, g, b] = [p, q, v];
+        case 4: [r, g, b] = [t, p, v];
+        case 5: [r, g, b] = [v, p, q];
+        default: [r, g, b] = [v, p, q];
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), a];
 }
-rng(42);
-for (let i = 0; i < 10; i++) {
-    logger.debug('rng() (seed:42):', rng());
-}
 
-logger.todo('*** TODO: Add test for CanvasRenderer ***');
-logger.todo('*** TODO: Add test for WebGLRenderer ***');
+const m = 6;
+const color = Math.floor(Math.random() * m);
+console.debug('color:', color);
+const h = 360 * (color / m);
 
-// logger.throw('Logger.throw() test');
+const div1: HTMLDivElement = document.createElement('div');
+div1.style.setProperty('width', '100px');
+div1.style.setProperty('height', '100px');
+div1.style.setProperty('background-color', `hsl(${h}, 100%, 50%)`);
+document.body.appendChild(div1);
+
+const div2: HTMLDivElement = document.createElement('div');
+div2.style.setProperty('width', '100px');
+div2.style.setProperty('height', '100px');
+div2.style.setProperty('background-color', `rgba(${hsvToRgba(h, 1.0, 1.0, 255).join(',')})`);
+document.body.appendChild(div2);
+
+const backgroundColor1: CSSStyleValue = div1.computedStyleMap().get('background-color')!;
+console.debug('div.style.backgroundColor:', backgroundColor1.toString());
+
+const backgroundColor2: CSSStyleValue = div2.computedStyleMap().get('background-color')!;
+console.debug('div.style.backgroundColor:', backgroundColor2.toString());
+
+console.debug('Color.HSV:', Color.HSV(h, 1.0, 1.0, 255).rgba);

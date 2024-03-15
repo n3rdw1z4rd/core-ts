@@ -1,6 +1,6 @@
 import { Logger } from './logger';
 
-const logger: Logger = new Logger('[ECS]');
+const log: Logger = new Logger('[ECS]');
 
 export type Component = any;
 
@@ -18,29 +18,29 @@ export interface System {
 }
 
 export class ECS {
-    private _entities: Entity[] = [];
-    private _components: Map<string, Component> = new Map<string, Component>();
-    private _systems: System[] = [];
+    entities: Entity[] = [];
+    components: Map<string, Component> = new Map<string, Component>();
+    systems: System[] = [];
 
     public createComponent(name: string, data: object) {
-        this._components.set(name, data);
+        this.components.set(name, data);
     }
 
     public createSystem<T extends string[]>(name: string, ...components: [...T, SystemCallback]): this {
         const callback: SystemCallback = components.pop() as SystemCallback;
 
-        if (!this._systems.find((system) => system.name === name)) {
+        if (!this.systems.find((system) => system.name === name)) {
             const system: System = {
                 name,
                 components: components.filter((comp: any) => (typeof comp === 'string')) as string[],
                 callback
             };
 
-            this._systems.push(system);
+            this.systems.push(system);
 
-            logger.debug(`[ECS] created system '${system.name}', components:`, system.components);
+            log.debug(`[ECS] created system '${system.name}', components:`, system.components);
         } else {
-            logger.warn('[ECS] createSystem: a system already exists with uid:', name);
+            log.warn('[ECS] createSystem: a system already exists with uid:', name);
         }
 
         return this;
@@ -48,12 +48,12 @@ export class ECS {
 
     public createEntity(...components: string[]): void {
         const entity: Entity = {
-            id: this._entities.length,
+            id: this.entities.length,
             components: new Map<string, Component>(),
         };
 
         components.forEach((name) => {
-            const component: Component | undefined = this._components.get(name);
+            const component: Component | undefined = this.components.get(name);
 
             if (component) {
                 const data: Component = {};
@@ -70,14 +70,14 @@ export class ECS {
             }
         });
 
-        this._entities.push(entity);
+        this.entities.push(entity);
     }
 
     public update(): void {
-        for (let i = 0; i < this._systems.length; i++) {
-            const system: System = this._systems[i];
+        for (let i = 0; i < this.systems.length; i++) {
+            const system: System = this.systems[i];
 
-            const entities: Entity[] = this._entities.filter((entity) => {
+            const entities: Entity[] = this.entities.filter((entity) => {
                 return system.components.every((component) => entity.components.has(component));
             });
 
