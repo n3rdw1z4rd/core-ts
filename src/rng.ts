@@ -71,6 +71,22 @@ export class Rng {
         for (let i = 0; i < length; i++) uid.push(this.choose(this._uid_characters));
         return uid.join('');
     }
+
+    randomMatrix(size: number): number[][] {
+        const rows: number[][] = [];
+
+        for (let i = 0; i < size; i++) {
+            const row: number[] = [];
+
+            for (let j = 0; j < size; j++) {
+                row.push(this.nextf * 2 - 1);
+            }
+
+            rows.push(row);
+        }
+
+        return rows;
+    }
 }
 
 export const rng: Rng = new Rng();

@@ -83,34 +83,7 @@ export class Color {
         ] : [255, 255, 255, 255];
     }
 
-    static HSV(h: number, s: number, v: number, a: number = 255): Color {
-        // log.debug(`HSV: h=${h}, s=${s}, v=${v}, a=${a}`);
-        // h = (h % 1 + 1) % 1;
-        // s = clamp(s, 0, 1);
-        // v = clamp(v, 0, 1);
-
-        // const i: number = (0 | (h * 6));
-        // const f: number = h * 6 - i;
-        // const p: number = v * (1 - s);
-        // const q: number = v * (1 - f * s);
-        // const t: number = v * (1 - (1 - f) * s);
-
-        // let r: number;
-        // let g: number;
-        // let b: number;
-
-        // switch (i % 6) {
-        //     case 0: [r, g, b] = [v, t, p];
-        //     case 1: [r, g, b] = [q, v, p];
-        //     case 2: [r, g, b] = [p, v, t];
-        //     case 3: [r, g, b] = [p, q, v];
-        //     case 4: [r, g, b] = [t, p, v];
-        //     case 5: [r, g, b] = [v, p, q];
-        //     default: [r, g, b] = [v, p, q];
-        // }
-
-        // return new Color(r, g, b, a);
-
+    public static fromHsv(h: number, s: number, v: number, a: number = 255): Color {
         let r: number = 0
         let g: number = 0
         let b: number = 0;
