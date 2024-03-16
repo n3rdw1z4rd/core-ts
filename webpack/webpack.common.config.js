@@ -1,0 +1,31 @@
+const { resolve } = require('path');
+
+module.exports = (DEV, PKG) => {
+    console.log(`*** ${PKG.name} - v${PKG.version} - ${DEV ? 'DEVELOPMENT' : 'PRODUCTION'} ***\n`);
+
+    return {
+        devtool: 'inline-source-map',
+        output: {
+            filename: 'index.js',
+            path: resolve(__dirname, '../dist'),
+            clean: true,
+        },
+        resolve: {
+            extensions: ['.ts', '.js', '.css'],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    exclude: /node_modules/,
+                    use: 'ts-loader',
+                },
+                {
+                    test: /\.css$/,
+                    use: ['style-loader', 'css-loader'],
+                },
+            ],
+        },
+        plugins: [],
+    }
+};

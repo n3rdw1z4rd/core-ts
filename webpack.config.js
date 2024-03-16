@@ -1,33 +1,9 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { resolve } = require('path');
+const DEV = (process.env.NODE_ENV !== 'production');
+const PKG = require('./package.json');
+const CONF = (DEV ? './webpack/webpack.dev.config' : './webpack/webpack.prod.config');
 
-module.exports = {
-    stats: 'minimal',
-    mode: 'development',
-    devtool: 'eval-cheap-source-map',
-    entry: resolve(__dirname, 'test/index.ts'),
-    resolve: {
-        extensions: ['.ts', '.js', '.css'],
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                exclude: /node_modules/,
-                use: 'ts-loader',
-            },
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
-            }
-        ],
-    },
-    devServer: {
-        host: '0.0.0.0',
-        port: 3000,
-        hot: true,
-    },
-    plugins: [
-        new HtmlWebpackPlugin({ inject: true }),
-    ],
-};
+const config = require(CONF)(DEV, PKG);
+
+console.log(JSON.stringify(config, null, 2));
+
+module.exports = config;

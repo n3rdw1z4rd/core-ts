@@ -1,4 +1,4 @@
-const isDev: boolean = (process.env.NODE_ENV?.toLowerCase() !== 'production');
+import { DEV } from './env';
 
 export class Logger {
     constructor(
@@ -8,7 +8,7 @@ export class Logger {
     ) { }
 
     todo(...args: any[]): void {
-        console.debug(
+        if (DEV) console.debug(
             '%c[TODO]%c ' + args.join(' '),
             'color: black; background-color: yellow; font-weight: bold;',
             'font-weight: bold;',
@@ -16,11 +16,11 @@ export class Logger {
     }
 
     trace(...args: any[]): void {
-        if (this.traceEnabled) console.log(this.prefix, this.tracePrefix, ...args);
+        if (DEV && this.traceEnabled) console.log(this.prefix, this.tracePrefix, ...args);
     }
 
     debug(...args: any[]): void {
-        if (isDev) console.debug(this.prefix, ...args);
+        if (DEV) console.debug(this.prefix, ...args);
     }
 
     info(...args: any[]): void {
