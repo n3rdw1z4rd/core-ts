@@ -1,6 +1,6 @@
 import '../src/css/reset.css';
 import '../src/css/my-styles.css';
-import { Clock, Emitter, Logger, clamp, rng } from '../src';
+import { Clock, DEV, Emitter, Logger, clamp, rng } from '../src';
 
 const logger: Logger = new Logger('[Test]');
 logger.traceEnabled = true;
@@ -9,6 +9,7 @@ logger.debug('Logger.debug() test');
 logger.info('Logger.info() test');
 logger.warn('Logger.warn() test');
 logger.error('Logger.error() test');
+
 
 const clock: Clock = new Clock();
 console.log('*** Clock:', clock);

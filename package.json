@@ -8,7 +8,7 @@
         "dist"
     ],
     "scripts": {
-        "build": "tsc && shx cp -r ./src/css ./dist/css",
+        "build": "cross-env NODE_ENV=production webpack && shx cp -r ./src/css ./dist/css",
         "dev": "webpack serve",
         "prepublishOnly": "npm run build"
     },
