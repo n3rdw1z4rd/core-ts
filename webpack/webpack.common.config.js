@@ -1,4 +1,5 @@
 const { resolve } = require('path');
+const { DefinePlugin } = require('webpack');
 
 module.exports = (DEV, PKG) => {
     console.log(`*** ${PKG.name} - v${PKG.version} - ${DEV ? 'DEVELOPMENT' : 'PRODUCTION'} ***\n`);
@@ -32,6 +33,10 @@ module.exports = (DEV, PKG) => {
                 },
             ],
         },
-        plugins: [],
+        plugins: [
+            new DefinePlugin({
+                'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            })
+        ],
     }
 };
