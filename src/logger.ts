@@ -39,3 +39,5 @@ export class Logger {
         throw `[${this.prefix}] ${args.join(' ')}`;
     }
 }
+
+export const log: Logger = new Logger('[DEV]');
