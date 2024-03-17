@@ -4,6 +4,7 @@ module.exports = (DEV, PKG) => {
     console.log(`*** ${PKG.name} - v${PKG.version} - ${DEV ? 'DEVELOPMENT' : 'PRODUCTION'} ***\n`);
 
     return {
+        stats: 'minimal',
         devtool: 'inline-source-map',
         output: {
             filename: 'index.js',

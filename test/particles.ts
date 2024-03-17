@@ -1,6 +1,6 @@
 import '../src/css/reset.css';
 import '../src/css/my-styles.css';
-import { CanvasRenderer, Clock, Color, ECS, Entity, Logger, StatsDiv, rng } from '../src';
+import { CanvasRenderer, Clock, Color, ECS, Logger, StatsDiv, rng } from '../src';
 
 const log: Logger = new Logger();
 log.info('*** particle-life: https://www.youtube.com/watch?v=scvuli-zcRc ***');
@@ -50,21 +50,21 @@ ecs.createComponent('particle', {
     py: () => rng.nextf,
     vx: 0,
     vy: 0,
-    color: () => ((rng.nextf * particleTypeCount) | 0),
+    color: () => rng.range(particleTypeCount - 1),
 });
 
-ecs.createSystem('update_velocities', 'particle', (entities: Entity[]) => {
+ecs.createSystem('update_velocities', 'particle', (entities: any[]) => {
     const frictionFactor: number = Math.pow(0.5, calcSpeed() / frictionHalfLife);
 
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < entities.length; i++) {
         let totalForceX: number = 0;
         let totalForceY: number = 0;
 
-        for (let j = 0; j < particleCount; j++) {
+        for (let j = 0; j < entities.length; j++) {
             if (j === i) continue;
 
-            let rx: number = entities[j].components.particle.px - entities[i].components.particle.px;
-            let ry: number = entities[j].components.particle.py - entities[i].components.particle.py;
+            let rx: number = entities[j].particle.px - entities[i].particle.px;
+            let ry: number = entities[j].particle.py - entities[i].particle.py;
 
             if (Math.abs(rx) > 0.5) rx = rx > 0 ? rx - 1 : rx + 1;
             if (Math.abs(ry) > 0.5) ry = ry > 0 ? ry - 1 : ry + 1;
@@ -74,7 +74,8 @@ ecs.createSystem('update_velocities', 'particle', (entities: Entity[]) => {
             if (r > 0 && r < maxRadiusFactor) {
                 const f: number = calcForce(
                     r / maxRadiusFactor,
-                    attractionMatrix[entities[i].components.particle.color][entities[j].components.particle.color]);
+                    attractionMatrix[entities[i].particle.color][entities[j].particle.color]);
+
                 totalForceX += rx / r * f;
                 totalForceY += ry / r * f;
             }
@@ -83,28 +84,30 @@ ecs.createSystem('update_velocities', 'particle', (entities: Entity[]) => {
         totalForceX *= maxRadiusFactor * forceFactor;
         totalForceY *= maxRadiusFactor * forceFactor;
 
-        entities[i].components.particle.vx *= frictionFactor;
-        entities[i].components.particle.vy *= frictionFactor;
+        entities[i].particle.vx *= frictionFactor;
+        entities[i].particle.vy *= frictionFactor;
 
-        entities[i].components.particle.vx += totalForceX * calcSpeed();
-        entities[i].components.particle.vy += totalForceY * calcSpeed();
+        entities[i].particle.vx += totalForceX * calcSpeed();
+        entities[i].particle.vy += totalForceY * calcSpeed();
     }
 });
 
-ecs.createSystem('update_positions', 'particle', (entities: Entity[]) => {
+ecs.createSystem('update_positions', 'particle', (entities: any[]) => {
     for (let i = 0; i < particleCount; i++) {
-        entities[i].components.particle.px += entities[i].components.particle.vx * calcSpeed();
-        entities[i].components.particle.py += entities[i].components.particle.vy * calcSpeed();
+        entities[i].particle.px += entities[i].particle.vx * calcSpeed();
+        entities[i].particle.py += entities[i].particle.vy * calcSpeed();
 
-        if (entities[i].components.particle.px < 0) entities[i].components.particle.px = 1 + (entities[i].components.particle.px % 1);
-        if (entities[i].components.particle.px > 1) entities[i].components.particle.px = entities[i].components.particle.px % 1;
-        if (entities[i].components.particle.py < 0) entities[i].components.particle.py = 1 + (entities[i].components.particle.py % 1);
-        if (entities[i].components.particle.py > 1) entities[i].components.particle.py = entities[i].components.particle.py % 1;
+        if (entities[i].particle.px < 0) entities[i].particle.px = 1 + (entities[i].particle.px % 1);
+        if (entities[i].particle.px > 1) entities[i].particle.px = entities[i].particle.px % 1;
+        if (entities[i].particle.py < 0) entities[i].particle.py = 1 + (entities[i].particle.py % 1);
+        if (entities[i].particle.py > 1) entities[i].particle.py = entities[i].particle.py % 1;
 
-        const screenX: number = entities[i].components.particle.px * renderer.width;
-        const screenY: number = entities[i].components.particle.py * renderer.height;
-
-        renderer.setPixel(screenX, screenY, particleColors[entities[i].components.particle.color], particleSize);
+        renderer.setPixel(
+            entities[i].particle.px * renderer.width,
+            entities[i].particle.py * renderer.height,
+            particleColors[entities[i].particle.color],
+            particleSize,
+        );
     }
 });
 
@@ -115,13 +118,8 @@ clock.run(() => {
     const renderTime: number = clock.getExecuteTime(renderer.render.bind(renderer));
 
     clock.showStats({
-        'frictionHalfLife': frictionHalfLife,
         'particleCount': particleCount,
         'particleTypeCount': particleTypeCount,
-        'particleSize': particleSize,
-        'maxRadiusFactor': maxRadiusFactor,
-        'forceFactor': forceFactor,
-        'speedFactor': calcSpeed().toFixed(2),
         'ecs.update(ms)': ecsUpdateTime.toFixed(2),
         'renderer.render(ms)': renderTime.toFixed(2),
     });

@@ -1,4 +1,4 @@
-import { StatsDiv } from '.';
+import { StatsDiv } from './stats-div';
 
 export class Clock {
     private _lastFrameTime: number = 0;

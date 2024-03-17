@@ -1,5 +1,8 @@
 import { Color } from './color';
 import { clamp } from '../math';
+import { Logger } from '../logger';
+
+const log: Logger = new Logger('[CanvasRenderer]');
 
 export class WebGlRenderer {
     private _canvas: HTMLCanvasElement;

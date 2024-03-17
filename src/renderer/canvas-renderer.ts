@@ -1,5 +1,5 @@
-import { Logger } from '..';
 import { Color } from './color';
+import { Logger } from '../logger';
 
 const log: Logger = new Logger('[CanvasRenderer]');
 
