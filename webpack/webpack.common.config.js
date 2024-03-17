@@ -10,6 +10,11 @@ module.exports = (DEV, PKG) => {
             filename: 'index.js',
             path: resolve(__dirname, '../dist'),
             clean: true,
+            globalObject: 'this',
+            library: {
+                name: 'index.js',
+                type: 'umd',
+            },
         },
         resolve: {
             extensions: ['.ts', '.js', '.css'],
